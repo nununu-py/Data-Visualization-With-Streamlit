@@ -7,7 +7,7 @@ st.set_page_config(layout="centered")
 st.header("Data Visualization")
 st.markdown("---")
 
-dataframe = pd.read_csv('d:/Bootcamp/Data Viz Udemy (Gusksra)/tips.csv')
+dataframe = pd.read_csv('tips.csv')
 st.caption("Random 10 Sample Data Frame")
 
 button1, button2 = st.columns(2, gap="small")
