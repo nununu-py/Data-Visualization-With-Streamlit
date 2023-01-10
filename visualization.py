@@ -286,3 +286,12 @@ with st.container():
                         y='tip', color='time')
 
     st.plotly_chart(figure)
+  
+# PIE CHART
+with st.container():
+    
+    feature = ['sex', 'day', 'smoker', 'time']
+
+    feature_selected3 = st.multiselect(label='select feature', options=feature)
+    fig = px.sunburst(data_frame=new_df, path=feature_selected3)
+    st.plotly_chart(fig)
