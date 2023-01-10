@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.set_page_config(layout="centered")
 st.header("Data Visualization")
@@ -58,15 +59,14 @@ with st.container():
             ax.bar(sex_distribution.index, sex_distribution)
             st.pyplot(fig)
 
+    with st.expander("CHECK TABLE INFO"):
 
-with st.expander("CHECK TABLE INFO"):
-
-    st.write(sex_distribution)
+        st.write(sex_distribution)
 
 
 # DYNAMIC
 st.markdown("---")
-st.header("Dynamic Visualization")
+st.header("Interactive Visualization")
 st.write("Make Bar Chart and Pie Chart Using Multiselect Feature")
 
 with st.container():
@@ -106,18 +106,19 @@ with st.container():
 
 # USING SEABORN
 
-st.markdown("---")
-st.header("Sex Distribution 'Static Visualization' with Box plot")
+with st.container():
 
-fig, ax = plt.subplots()
-sns.boxplot(data=dataframe, x="sex", y="total_bill", ax=ax)
+    st.markdown("---")
+    st.header("Sex Distribution 'Static Visualization' with Box plot")
 
-st.pyplot(fig=fig)
+    fig, ax = plt.subplots()
+    sns.boxplot(data=dataframe, x="sex", y="total_bill", ax=ax)
 
-st.markdown("---")
+    st.pyplot(fig=fig)
 
 with st.container():
 
+    st.markdown("---")
     st.header("Select Feature 'Dynamic Visualization'")
     feature = st.selectbox(
         label="Select Feature To Visualization", options=list_feature)
@@ -132,7 +133,7 @@ st.header("Multi Chart Visualization")
 
 with st.container():
 
-    chart = ("box", "violin", "kdeplot", "histogram")
+    chart = ("kdeplot", "violin", "bar", "histogram")
 
     col1, col2 = st.columns(2)
 
@@ -176,7 +177,7 @@ with st.container():
     col1, col2 = st.columns(2)
 
     with col1:
-        st.write("Dataframe total bill group by day and sex")
+        st.write("Dataframe total bill group by day and sex 'stack index position'")
         st.dataframe(new_dataframe)
 
         fig, ax = plt.subplots()
@@ -185,9 +186,10 @@ with st.container():
         st.pyplot(fig)
 
     with col2:
-        st.write("Dataframe total bill group by day and sex 'unstack position'")
+        st.write("Dataframe total bill group by day and sex 'unstack index position'")
         new_dataframe1 = new_dataframe.unstack()
         st.dataframe(new_dataframe1)
+
         for i in range(5):
             st.write(" ")
         fig, ax = plt.subplots()
@@ -195,6 +197,22 @@ with st.container():
                             stacked=True)  # stacked = False
         ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.9))
         st.pyplot(fig)
+
+    with st.container():
+
+        # MAKE PLOTLY CHART USING PIVOT TABLE
+
+        # st.dataframe(new_dataframe1.columns)
+        stacked_index = new_dataframe.iloc[:, 0]
+        # st.dataframe()
+        colName_index = list(stacked_index.index)
+
+        new_index = [f"{i[0]} {i[1]}" for i in colName_index]
+
+        figure = px.bar(data_frame=stacked_index, x=new_index,
+                        y='total_bill', color=new_index)
+
+        st.plotly_chart(figure)
 
 # PLOT CONTROL MULTIPLE WIDGET
 st.markdown("---")
@@ -229,32 +247,42 @@ with st.container():
         else:
             stacked_pos = False
 
-if len_xaxes_sel < 1:
-    st.warning("NO FEATURE SELECTED")
-
-fig, ax = plt.subplots()
-
-grouping_data = data[xaxes_sel+y_axes].groupby(xaxes_sel).mean()
-
-if len_xaxes_sel > 1:
-    for i in range(len_xaxes_sel-1):
-        grouping_data = grouping_data.unstack()
+    if len_xaxes_sel < 1:
+        st.warning("NO FEATURE SELECTED")
 
     fig, ax = plt.subplots()
-    grouping_data.plot(kind=chart_select, ax=ax, stacked=stacked_pos)
-    grouping_data.fillna(0, inplace=True)
 
-else:
+    grouping_data = data[xaxes_sel+y_axes].groupby(xaxes_sel).mean()
 
-    fig, ax = plt.subplots()
-    grouping_data.plot(kind=chart_select, ax=ax)
+    if len_xaxes_sel > 1:
+        for i in range(len_xaxes_sel-1):
+            grouping_data = grouping_data.unstack()
 
-# Viz
+        fig, ax = plt.subplots()
 
-ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.8))
-ax.set_ylabel("Avg Total Bills")
-st.pyplot(fig)
+        grouping_data.plot(kind=chart_select, ax=ax, stacked=stacked_pos)
+        grouping_data.fillna(0, inplace=True)
 
-st.header("Show The Data From Visualization")
-with st.expander("This is Your Data"):
-    st.dataframe(grouping_data)
+    else:
+
+        fig, ax = plt.subplots()
+        grouping_data.plot(kind=chart_select, ax=ax)
+
+    ax.legend(loc="center left", bbox_to_anchor=(1.0, 0.8))
+    ax.set_ylabel("Avg Total Bills")
+    st.pyplot(fig)
+
+    with st.expander("Display Data"):
+        st.dataframe(grouping_data)
+
+# SCATTER PLOT
+with st.container():
+
+    st.markdown("---")
+    st.header("Scatter Plot")
+    st.write("Find Correlation Betwen Total Bill and Tip")
+
+    figure = px.scatter(data_frame=dataframe, x='total_bill',
+                        y='tip', color='time')
+
+    st.plotly_chart(figure)
