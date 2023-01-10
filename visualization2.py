@@ -13,7 +13,7 @@ st.bar_chart(data=df)
 st.area_chart(data=df)
 st.line_chart(data=df)
 
-new_df = pd.read_csv('D:/Bootcamp/Data Viz Udemy (Gusksra)/tips.csv')
+new_df = pd.read_csv('tips.csv')
 
 # PLOTLY
 st.header("Visualization With Plotly")
