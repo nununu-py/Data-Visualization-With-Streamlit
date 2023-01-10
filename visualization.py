@@ -293,6 +293,6 @@ with st.container():
     st.header("Pie Chart")
     feature = ['sex', 'day', 'smoker', 'time']
 
-    feature_selected3 = st.multiselect(label='select feature', options=feature)
+    feature_selected3 = st.multiselect(label='select feature', options=feature, default=feature[0])
     fig = px.sunburst(data_frame=dataframe, path=feature_selected3)
     st.plotly_chart(fig)
